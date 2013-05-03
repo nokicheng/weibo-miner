@@ -307,6 +307,7 @@ class _Executable(object):
         method = _METHOD_MAP[self._method]
         if method==_HTTP_POST and 'pic' in kw:
             method = _HTTP_UPLOAD
+        url = '%s%s.json' % (self._client.api_url, self._path)
         return _http_call('%s%s.json' % (self._client.api_url, self._path), method, self._client.access_token, **kw)
 
     def __str__(self):
