@@ -26,6 +26,14 @@ from weibo import APIClient as WeiboAPIClient
 #Base = declarative_base()
 
 
+#
+from weibo import APIClient as WeiboAPIClient
+#
+from rauth.service import OAuth2Service
+#
+#Base = declarative_base()
+#
+#
 #class WeiboUser(Base):
 #    __tablename__ = "stock"
 #
@@ -135,12 +143,16 @@ def weibo_auth():
 
     print(1212121212)
 
+def auth_v1():
+    global code, access_token, expires_in
+
     redirect_uri = 'https://api.weibo.com/oauth2/default.html'
     client = WeiboAPIClient(app_key=client_key, app_secret=client_secret,
                        redirect_uri=redirect_uri)
     if (not code) and (not access_token):
         print('Open this URL in web browser:\n%s' % client.get_authorize_url())
         return
+        print(client.get_authorize_url())
     elif not access_token:
         r = client.request_access_token(code)
         access_token = r.access_token
@@ -192,6 +204,23 @@ def main():
     dig()
 
     return
+        print(access_token)
+        print(expires_in)
+    else:
+        client.set_access_token(access_token, expires_in)
+        #print(client.statuses.user_timeline.get())
+        #print(client.account.profile.email.get())
+        params = {'screen_name':'haiyuzhang'}
+        #params = {'uid' : 1897208167}
+        params = {'uid' : 1962065563}
+        print(client.friendships.friends.get(**params))
+        print(client.users.show.get(**params))
+        pass
+    return
+
+def main():
+    #auth_v0()
+    auth_v1()
 
 if __name__ == "__main__":
     #unittest.main()
