@@ -20,9 +20,22 @@ except ImportError:
 
 import gzip, time, hmac, base64, hashlib, urllib, urllib2, logging, mimetypes, collections
 
+
+class APIErrorReason(object):
+    ERRRATELIMIT = 'User requests out of rate limit'
+    ERRAUTH = 'authorization'
+    def __init__(self, error):
+
+        if 'User requests out of rate limit' in error:
+            self.reason = APIErrorReason.ERRRATELIMIT 
+        return
+
+    def __str__(self):
+        return self.reason
+
+
 class APIError(StandardError):
-    '''
-    raise APIError if receiving json message indicating failure.
+    '''raise APIError if receiving json message indicating failure.
     '''
     def __init__(self, error_code, error, request):
         self.error_code = error_code
@@ -32,6 +45,22 @@ class APIError(StandardError):
 
     def __str__(self):
         return 'APIError: %s: %s, request: %s' % (self.error_code, self.error, self.request)
+
+    @property
+    def reason(self):
+        return str(APIErrorReason(self.error))
+
+
+class APIRateLimitError(StandardError):
+    def __init__(self, error_code, error, request):
+        self.error_code = error_code
+        self.error = error
+        self.request = request
+        StandardError.__init__(self, error)
+
+    def __str__(self):
+        return 'APIError: %s: %s, request: %s' % (self.error_code, self.error, self.request)
+
 
 def _parse_json(s):
     ' parse str into JsonDict '
