@@ -1,0 +1,231 @@
+1212121212
+1648237865
+'ascii' codec can't encode characters in position 0-5: ordinal not in range(128)
+1741692611
+'ascii' codec can't encode characters in position 0-1: ordinal not in range(128)
+2247657845
+'ascii' codec can't encode characters in position 0-4: ordinal not in range(128)
+2154194070
+'ascii' codec can't encode characters in position 7-9: ordinal not in range(128)
+2814054782
+'ascii' codec can't encode characters in position 0-4: ordinal not in range(128)
+1197362373
+'ascii' codec can't encode characters in position 0-2: ordinal not in range(128)
+2130349045
+BigBangNeo
+1738141833
+'ascii' codec can't encode characters in position 0-2: ordinal not in range(128)
+1780481403
+'ascii' codec can't encode characters in position 0-3: ordinal not in range(128)
+1724405020
+'ascii' codec can't encode characters in position 0-4: ordinal not in range(128)
+1908815112
+'ascii' codec can't encode characters in position 0-4: ordinal not in range(128)
+1762720937
+'ascii' codec can't encode characters in position 0-1: ordinal not in range(128)
+1895874915
+MaHui_99
+2948192350
+'ascii' codec can't encode characters in position 0-1: ordinal not in range(128)
+1861520622
+'ascii' codec can't encode characters in position 0-3: ordinal not in range(128)
+1885486011
+'ascii' codec can't encode characters in position 0-5: ordinal not in range(128)
+1562800575
+'ascii' codec can't encode characters in position 0-4: ordinal not in range(128)
+2787800541
+'ascii' codec can't encode characters in position 0-3: ordinal not in range(128)
+2447833907
+'ascii' codec can't encode character u'\u5ca9' in position 0: ordinal not in range(128)
+1847313622
+MV-Michelle
+1899152915
+'ascii' codec can't encode characters in position 0-1: ordinal not in range(128)
+1405982765
+'ascii' codec can't encode characters in position 0-1: ordinal not in range(128)
+2566997827
+gotonextday
+1644492510
+'ascii' codec can't encode characters in position 0-1: ordinal not in range(128)
+3174689885
+deunaw
+1752180747
+'ascii' codec can't encode characters in position 0-2: ordinal not in range(128)
+2106931094
+xiaoxcui
+1814410240
+'ascii' codec can't encode characters in position 0-2: ordinal not in range(128)
+1268518877
+APIError: 10023: User requests out of rate limit!, request: /2/users/show.json
+1752962284
+APIError: 10023: User requests out of rate limit!, request: /2/users/show.json
+2635709761
+APIError: 10023: User requests out of rate limit!, request: /2/users/show.json
+1660828900
+APIError: 10023: User requests out of rate limit!, request: /2/users/show.json
+1214173050
+APIError: 10023: User requests out of rate limit!, request: /2/users/show.json
+1700892914
+APIError: 10023: User requests out of rate limit!, request: /2/users/show.json
+1912175705
+APIError: 10023: User requests out of rate limit!, request: /2/users/show.json
+1211598953
+APIError: 10023: User requests out of rate limit!, request: /2/users/show.json
+1648782501
+APIError: 10023: User requests out of rate limit!, request: /2/users/show.json
+1874414407
+APIError: 10023: User requests out of rate limit!, request: /2/users/show.json
+2880884770
+APIError: 10023: User requests out of rate limit!, request: /2/users/show.json
+1733787147
+APIError: 10023: User requests out of rate limit!, request: /2/users/show.json
+1921864047
+APIError: 10023: User requests out of rate limit!, request: /2/users/show.json
+1743240543
+APIError: 10023: User requests out of rate limit!, request: /2/users/show.json
+1771308735
+APIError: 10023: User requests out of rate limit!, request: /2/users/show.json
+1838993640
+APIError: 10023: User requests out of rate limit!, request: /2/users/show.json
+1594590224
+APIError: 10023: User requests out of rate limit!, request: /2/users/show.json
+1805238811
+APIError: 10023: User requests out of rate limit!, request: /2/users/show.json
+1675701825
+APIError: 10023: User requests out of rate limit!, request: /2/users/show.json
+2377466482
+APIError: 10023: User requests out of rate limit!, request: /2/users/show.json
+1752893252
+APIError: 10023: User requests out of rate limit!, request: /2/users/show.json
+1880437660
+APIError: 10023: User requests out of rate limit!, request: /2/users/show.json
+1211107793
+APIError: 10023: User requests out of rate limit!, request: /2/users/show.json
+1056139761
+APIError: 10023: User requests out of rate limit!, request: /2/users/show.json
+1680044997
+APIError: 10023: User requests out of rate limit!, request: /2/users/show.json
+1249193625
+APIError: 10023: User requests out of rate limit!, request: /2/users/show.json
+1721131891
+APIError: 10023: User requests out of rate limit!, request: /2/users/show.json
+1036110284
+APIError: 10023: User requests out of rate limit!, request: /2/users/show.json
+1861960825
+APIError: 10023: User requests out of rate limit!, request: /2/users/show.json
+1734851230
+APIError: 10023: User requests out of rate limit!, request: /2/users/show.json
+1888498011
+APIError: 10023: User requests out of rate limit!, request: /2/users/show.json
+2477893257
+APIError: 10023: User requests out of rate limit!, request: /2/users/show.json
+2181315451
+APIError: 10023: User requests out of rate limit!, request: /2/users/show.json
+1667003452
+APIError: 10023: User requests out of rate limit!, request: /2/users/show.json
+2133354391
+APIError: 10023: User requests out of rate limit!, request: /2/users/show.json
+1647850037
+APIError: 10023: User requests out of rate limit!, request: /2/users/show.json
+2051360684
+APIError: 10023: User requests out of rate limit!, request: /2/users/show.json
+1444276155
+APIError: 10023: User requests out of rate limit!, request: /2/users/show.json
+1804081724
+APIError: 10023: User requests out of rate limit!, request: /2/users/show.json
+2755165844
+APIError: 10023: User requests out of rate limit!, request: /2/users/show.json
+1827344001
+APIError: 10023: User requests out of rate limit!, request: /2/users/show.json
+1875669811
+APIError: 10023: User requests out of rate limit!, request: /2/users/show.json
+1859884180
+APIError: 10023: User requests out of rate limit!, request: /2/users/show.json
+1751309223
+APIError: 10023: User requests out of rate limit!, request: /2/users/show.json
+2022697174
+APIError: 10023: User requests out of rate limit!, request: /2/users/show.json
+1976673535
+APIError: 10023: User requests out of rate limit!, request: /2/users/show.json
+1729206382
+APIError: 10023: User requests out of rate limit!, request: /2/users/show.json
+1637699913
+APIError: 10023: User requests out of rate limit!, request: /2/users/show.json
+1663717751
+APIError: 10023: User requests out of rate limit!, request: /2/users/show.json
+1783538157
+APIError: 10023: User requests out of rate limit!, request: /2/users/show.json
+1742741072
+APIError: 10023: User requests out of rate limit!, request: /2/users/show.json
+2523825594
+APIError: 10023: User requests out of rate limit!, request: /2/users/show.json
+1563948157
+APIError: 10023: User requests out of rate limit!, request: /2/users/show.json
+1756603847
+APIError: 10023: User requests out of rate limit!, request: /2/users/show.json
+2463041525
+APIError: 10023: User requests out of rate limit!, request: /2/users/show.json
+2549264394
+APIError: 10023: User requests out of rate limit!, request: /2/users/show.json
+1985882763
+APIError: 10023: User requests out of rate limit!, request: /2/users/show.json
+1529573474
+APIError: 10023: User requests out of rate limit!, request: /2/users/show.json
+2560902094
+APIError: 10023: User requests out of rate limit!, request: /2/users/show.json
+2106262412
+APIError: 10023: User requests out of rate limit!, request: /2/users/show.json
+2091532674
+APIError: 10023: User requests out of rate limit!, request: /2/users/show.json
+1868344355
+APIError: 10023: User requests out of rate limit!, request: /2/users/show.json
+1097353987
+APIError: 10023: User requests out of rate limit!, request: /2/users/show.json
+1905877157
+APIError: 10023: User requests out of rate limit!, request: /2/users/show.json
+1862744325
+APIError: 10023: User requests out of rate limit!, request: /2/users/show.json
+1183822315
+APIError: 10023: User requests out of rate limit!, request: /2/users/show.json
+2236919112
+APIError: 10023: User requests out of rate limit!, request: /2/users/show.json
+1681179143
+APIError: 10023: User requests out of rate limit!, request: /2/users/show.json
+1746617002
+APIError: 10023: User requests out of rate limit!, request: /2/users/show.json
+1638311112
+APIError: 10023: User requests out of rate limit!, request: /2/users/show.json
+1937439635
+APIError: 10023: User requests out of rate limit!, request: /2/users/show.json
+1820143777
+APIError: 10023: User requests out of rate limit!, request: /2/users/show.json
+1765628495
+APIError: 10023: User requests out of rate limit!, request: /2/users/show.json
+2296376534
+APIError: 10023: User requests out of rate limit!, request: /2/users/show.json
+1734932202
+APIError: 10023: User requests out of rate limit!, request: /2/users/show.json
+1271478100
+APIError: 10023: User requests out of rate limit!, request: /2/users/show.json
+2249284924
+APIError: 10023: User requests out of rate limit!, request: /2/users/show.json
+1894734940
+APIError: 10023: User requests out of rate limit!, request: /2/users/show.json
+1862718664
+APIError: 10023: User requests out of rate limit!, request: /2/users/show.json
+1649005320
+APIError: 10023: User requests out of rate limit!, request: /2/users/show.json
+1704116960
+APIError: 10023: User requests out of rate limit!, request: /2/users/show.json
+1282005885
+APIError: 10023: User requests out of rate limit!, request: /2/users/show.json
+1663363857
+APIError: 10023: User requests out of rate limit!, request: /2/users/show.json
+1758970411
+APIError: 10023: User requests out of rate limit!, request: /2/users/show.json
+1976376893
+APIError: 10023: User requests out of rate limit!, request: /2/users/show.json
+1720827773
+APIError: 10023: User requests out of rate limit!, request: /2/users/show.json
+1456091494
+APIError: 10023: User requests out of rate limit!, request: /2/users/show.json
