@@ -14,6 +14,7 @@ import errno
 from Queue import Queue
 from datetime import datetime
 import json
+import urllib2
 
 from unittest import TestCase
 
@@ -23,10 +24,20 @@ from unittest import TestCase
 #from sqlalchemy.orm import sessionmaker
 #from sqlalchemy.ext.declarative import declarative_base
 
+
+import mechanize
+
 import weibo
 from weibo import APIClient as WeiboAPIClient
 
-logging.basicConfig(level=logging.DEBUG)
+
+__version__ = '1.0.0'
+__author__ = 'Kevin Zhang (kevin.misc.10@gmail.com)'
+
+
+LOGFMT = '%(asctime)-15s %(message)s'
+DATEFMT = '%y/%m/%d %H:%M:%S.%f'
+logging.basicConfig(format=LOGFMT, datefmt=DATEFMT, level=logging.DEBUG)
 
 
 #db = "sqlite:///:memory:"
@@ -39,9 +50,6 @@ logging.basicConfig(level=logging.DEBUG)
 ##session.commit()
 #
 
-client_key = '3356415000'
-client_secret = '70eea2f2cd0e37184f0a37d155034c12'
-
 
 weibo_token = {
     "key" : "3356415000",
@@ -51,23 +59,36 @@ weibo_token = {
     "expires_in" : 0
 }
 
+WEIBO_IDS = (
+    {
+        'id' : 1897208167,         # mine
+        'screen_name': 'haiyuzhang',
+        'name': 'haiyuzhang',
+    }, {
+        'id' : 1962065563,         # tian
+        'screen_name': "米其林的肚肚皮",
+        'name': "米其林的肚肚皮",
+    }, {
+        "id": 1073610035,
+        "idstr": "1073610035",
+        "screen_name": "范范要少吃饭饭",
+        "name": "范范要少吃饭饭",
+    }
+)
 
-WEIBO_IDS = {
-    1897208167,         # mine
-    1962065563,         # tian
-}
 
+ONE_SEC = 1
+ONE_MINUTE = 60 * ONE_SEC
+ONE_HOUR = 60 * ONE_MINUTE 
 
-one_sec = 1
-one_hour = 60 * 60 * one_sec
 
 class APIThrottler(threading.Thread):
     def __init__(self):
         super(APIThrottler, self).__init__()
 
         self.max_api_calls_per_hour = 150
-        #self.api_rate = float(self.max_api_calls_per_hour) / one_hour
-        self.api_rate = one_hour / float(self.max_api_calls_per_hour)
+        #self.api_rate = float(self.max_api_calls_per_hour) / ONE_HOUR
+        self.api_rate = ONE_HOUR / float(self.max_api_calls_per_hour)
 
         self.api_token_queue = Queue(maxsize=self.max_api_calls_per_hour)
         self.api_token_index = 0
@@ -75,6 +96,7 @@ class APIThrottler(threading.Thread):
         self.token_water_level = self.max_api_calls_per_hour 
 
         self.__run = True
+        self.daemon = True
 
         return
 
@@ -100,7 +122,7 @@ class APIThrottler(threading.Thread):
                 self.token_water_level -= 1
                 self.api_token_index += 1
 
-            time.sleep(one_hour)
+            time.sleep(ONE_HOUR)
             self.token_water_level = self.max_api_calls_per_hour 
 
         return
@@ -190,21 +212,36 @@ class WeiboMiner(APIConsumer):
         self.access_token = ''
         self.expires_in = 0
 
-        self.load_access_token()
+        #self.load_access_token()
 
-        if not self.authorize():
-            if not self.request_access_token():
-                self.logger.error('0x{_id:X}: Failed to get authorization'.format(
-                                  _id=id(self), data=data))
-                return
+        #if not self.authorize():
+        #    if not self.request_access_token():
+        #        self.logger.error('0x{_id:X}: Failed to get authorization'.format(
+        #                          _id=id(self), data=data))
+        #        return
 
         return
 
     def request_access_token(self):
         '''Request access token from Weibo API interface
         '''
-        print('Open this URL in web browser:\n%s' % \
-              self.api_client.get_authorize_url())
+        auth_url = self.api_client.get_authorize_url()
+
+        resp = urllib2.urlopen(auth_url)
+        print(resp.__class__.__name__)
+        print(dir(resp))
+        print(resp.url)
+        print(resp.msg)
+        print(resp.headers)
+        print(resp.info)
+        if isinstance(resp, urllib2.Request):
+            print(resp)
+            pass
+        else:
+            pass
+
+        print('Open this URL in web browser:\n%s' % auth_url)
+
         self.code = raw_input('Paste access_token here:>')
 
         r = self.api_client.request_access_token(self.code)
@@ -216,7 +253,7 @@ class WeiboMiner(APIConsumer):
 
         return True
 
-    def update_access_token(self, access_token, expire_in):
+    def update_access_token(self, access_token, expires_in=None):
         '''Update access token and save it into access_token file
         '''
         self.access_token = access_token
@@ -266,11 +303,12 @@ class WeiboMiner(APIConsumer):
         self.api_client.set_access_token(self.access_token,
                                               self.expires_in)
 
-        return True
-        #return False
+        #return True
+        return False
 
     def dig(self):
-        params = {'uid' : 1962065563, 'count' : 1000}
+        params = {'uid' : 1073610035, 'count' : 1000}
+
         try:
             friend_ids = self.api_client.friendships.friends.ids.get(**params)
         except weibo.APIError as e:
@@ -284,11 +322,51 @@ class WeiboMiner(APIConsumer):
                     self.logger.error('Failed to get api token')
                     break
                 user_info = self.api_client.users.show.get(**params)
-                print(_id)
-                print(user_info['screen_name'])
+                self.logger.debug('0x{0:X} {1} {2}' % (id(self),
+                                  user_info['id'],
+                                  user_info['screen_name']))
+            except UnicodeError as e:
+                print(user_info)
+                pass
             except weibo.APIError as e:
                 self.logger.error(e)
                 pass
+
+        return
+
+    def login(self):
+        self.br = mechanize.Browser()
+        self.br.set_handle_robots(False)
+        #self.br.set_handle_refresh(False)
+        self.br.addheaders = [('User-Agent', 'Mozilla/5.0 Chrome/26.0.1410.64 Safari/537.31')]
+        url_login = 'http://login.sina.com.cn'
+
+        resp = self.br.open(url_login)
+        print(resp.read())
+
+        for form in self.br.forms():
+            print('Form name: %s' % form.name)
+            print(form)
+
+        self.br.form = list(self.br.forms())[0]
+
+        for control in self.br.form.controls:
+            print(control)
+            try:
+                value = self.br[control.name]
+                print('type:%s, name:%s, value:%s' % (control.type,
+                      control.name, value))
+            except ValueError as e:
+                pass
+
+        control_username = self.br.form.find_control('username')
+        control_username.value = 'kevin.misc.10@gmail.com'
+        control_password = self.br.form.find_control('password')
+        control_password.value = '951753'
+
+        resp = self.br.submit()
+        html = resp.read()
+        print(html)
 
         return
 
@@ -307,15 +385,21 @@ class WeiboMinerTest(TestCase):
 
         return
 
+
     def test_load_access_token(self):
         access_token = self.miner.load_access_token()
         print(access_token)
         #self.assertIsNone(self.miner.load_access_token())
         return
 
+    def test_login(self):
+        self.miner.login()
+        return
+
     def runTest(self, output=None):
-        self.test_load_access_token()
-        self.test_update_access_token()
+        #self.test_load_access_token()
+        #self.test_update_access_token()
+        self.test_login()
         return
 
     def tearDown(self):
@@ -323,17 +407,88 @@ class WeiboMinerTest(TestCase):
         return
 
 
+api_throttler = APIThrottler()
+
+
 def main():
     global api_throttler
 
-    api_throttler = APIThrottler()
     api_throttler.start()
 
     weibo_miner = WeiboMiner()
     weibo_miner.dig()
+    api_throttler.stop()
 
     return
 
-if __name__ == "__main__":
+def test():
+    user_info = {'bi_followers_count': 476,
+                 'domain': u'yimaobuba',
+                 'avatar_large': u'http://tp2.sinaimg.cn/1648237865/180/5637076046/1',
+                 'block_word': 1,
+                 'statuses_count': 9323,
+                 'allow_all_comment': True,
+                 'id': 1648237865,
+                 'city': u'45',
+                 'province': u'400',
+                 'follow_me': False,
+                 'verified_reason': u'',
+                 'followers_count': 1194499,
+                 'location': u'\u6d77\u5916 \u6c99\u7279\u963f\u62c9\u4f2f',
+                 'mbtype': 12,
+                 'profile_url': u'yimaobuba',
+                 'status': {
+                     'reposts_count': 0,
+                     'favorited': False,
+                     'truncated': False,
+                     'text': u'\u6709\u5f88\u591a\u670b\u53cb\u90fd\u62c5\u5fc3\u5b69\u5b50\u8d70\u5931\u6216\u8005\u88ab\u62d0\u5356\uff0c\u8fd8\u6709\u5bb6\u91cc\u6709\u8001\u4eba\u6709\u8001\u5e74\u75f4\u5446\u75c7\u7684\u5bb6\u5ead\u3002\u6211\u770b\u5230\u6dd8\u5b9d\u4e0a\u6709\u5356GPS\u5b9a\u4f4d\u8ffd\u8e2a\u624b\u8868\uff0c\u53ef\u4ee5\u901a\u8fc7\u7535\u8111\u67e5\u8be2\u6234\u8868\u8005\u7684\u4f4d\u7f6e\uff0c\u751a\u81f3\u8fd8\u53ef\u4ee5\u5728\u5730\u56fe\u4e0a\u753b\u51fa\u4e00\u4e2a\u8303\u56f4\uff08\u5982\u81ea\u5df1\u7684\u5c0f\u533a\uff09\uff0c\u6234\u8868\u8005\u51fa\u4e86\u5c31\u81ea\u52a8\u53d1\u77ed\u4fe1\u5230\u5176\u4ed6\u624b\u673a\u62a5\u8b66\uff0c\u542c\u7740\u529f\u80fd\u633a\u5168\u53ea\u8981\u516d\u767e\u5757\u3002\u6709\u4eba\u4f7f\u7528\u6216\u8005\u5c1d\u8bd5\u8fc7\uff0c\u89c9\u5f97\u597d\u7528\u9760\u8c31\u5417\uff1f',
+                     'created_at': u'Sun May 05 09:17:05 +0800 2013',
+                     'mlevel': 0,
+                     'idstr': u'3574524966139079',
+                     'mid': u'3574524966139079',
+                     'visible': {'type': 0, 'list_id': 0},
+                     'attitudes_count': 0,
+                     'pic_urls': [],
+                     'in_reply_to_screen_name': u'',
+                     'source': u'<a href="http://weibo.com/" rel="nofollow">\u65b0\u6d6a\u5fae\u535a</a>',
+                     'in_reply_to_status_id': u'',
+                     'comments_count': 0,
+                     'geo': None,
+                     'id': 3574524966139079L,
+                     'in_reply_to_user_id': u''
+                 },
+                 'star': 0,
+                 'description': u'\u4ee5\u7f3a\u5fb7\u670d\u4eba',
+                 'friends_count': 527,
+                 'online_status': 1,
+                 'mbrank': 4,
+                 'idstr': u'1648237865',
+                 'profile_image_url': u'http://tp2.sinaimg.cn/1648237865/50/5637076046/1',
+                 'allow_all_act_msg': False,
+                 'verified': False,
+                 'geo_enabled': False,
+                 'screen_name': u'\u4e00\u6bdb\u4e0d\u62d4\u5927\u5e08',
+                 'lang': u'zh-cn',
+                 'weihao': u'',
+                 'remark': u'',
+                 'favourites_count': 13,
+                 'name': u'\u4e00\u6bdb\u4e0d\u62d4\u5927\u5e08',
+                 'url': u'http://beizhicheng.blog.caixin.cn/',
+                 'gender': u'm',
+                 'created_at': u'Wed Dec 23 22:01:12 +0800 2009',
+                 'verified_type': -1,
+                 'following': False
+            }
+
+    for k, v in user_info.items():
+        if isinstance(v, dict):
+            for k, v in user_info.items():
+                print('%s - %s' % (k, v))
+        else:
+            print(k, v)
+    return
+
+if __name__ == '__main__':
     main()
+    #test()
 
