@@ -14,9 +14,7 @@ import errno
 from Queue import Queue
 from datetime import datetime
 import json
-import urllib2
 
-from unittest import TestCase
 
 #from sqlalchemy import Column
 #from sqlalchemy import Integer, String
@@ -24,11 +22,7 @@ from unittest import TestCase
 #from sqlalchemy.orm import sessionmaker
 #from sqlalchemy.ext.declarative import declarative_base
 
-
-import mechanize
-
-import weibo
-from weibo import APIClient as WeiboAPIClient
+from weibo_api_client import weibo_api_client
 
 
 __version__ = '1.0.0'
@@ -51,21 +45,13 @@ logging.basicConfig(format=LOGFMT, datefmt=DATEFMT, level=logging.DEBUG)
 #
 
 
-weibo_token = {
-    "key" : "3356415000",
-    "secret" : "70eea2f2cd0e37184f0a37d155034c12",
-    "code" : None,
-    "access_token" : None,
-    "expires_in" : 0
-}
-
 WEIBO_IDS = (
     {
-        'id' : 1897208167,         # mine
+        'id' : 1897208167,
         'screen_name': 'haiyuzhang',
         'name': 'haiyuzhang',
     }, {
-        'id' : 1962065563,         # tian
+        'id' : 1962065563,
         'screen_name': "米其林的肚肚皮",
         'name': "米其林的肚肚皮",
     }, {
@@ -77,236 +63,18 @@ WEIBO_IDS = (
 )
 
 
-ONE_SEC = 1
-ONE_MINUTE = 60 * ONE_SEC
-ONE_HOUR = 60 * ONE_MINUTE 
-
-
-class APIThrottler(threading.Thread):
+class WeiboMiner(object):
     def __init__(self):
-        super(APIThrottler, self).__init__()
-
-        self.max_api_calls_per_hour = 150
-        #self.api_rate = float(self.max_api_calls_per_hour) / ONE_HOUR
-        self.api_rate = ONE_HOUR / float(self.max_api_calls_per_hour)
-
-        self.api_token_queue = Queue(maxsize=self.max_api_calls_per_hour)
-        self.api_token_index = 0
-
-        self.token_water_level = self.max_api_calls_per_hour 
-
-        self.__run = True
-        self.daemon = True
-
-        return
-
-    def run_v0(self):
-        while self.__run:
-            now = datetime.now().strftime('%Y/%m/%d %H:%M:%S.%f')
-            print(now)
-            self.api_token_queue.put('API Token: %d Timestamp %s' % (
-                                     self.api_token_index, now))
-            self.api_token_index += 1
-            time.sleep(self.api_rate)
-
-        return
-
-    def run(self):
-        while self.__run:
-            now = datetime.now().strftime('%Y/%m/%d %H:%M:%S.%f')
-            print(now)
-
-            while self.token_water_level > 0:
-                self.api_token_queue.put('API Token: %d Timestamp %s' % (
-                                         self.api_token_index, now))
-                self.token_water_level -= 1
-                self.api_token_index += 1
-
-            time.sleep(ONE_HOUR)
-            self.token_water_level = self.max_api_calls_per_hour 
-
-        return
-
-    def request_token(self):
-        access_token = self.api_token_queue.get()
-        return access_token
-
-    def stop(self):
-        self.__run = False
-        if self.is_alive():
-            self.join()
-        return
-
-
-class APIThrottlerTest(TestCase):
-    def setUp(self):
-        global api_throttler
-
-        if not hasattr(self, 'api_throttler'):
-            self.api_throttler = APIThrottler()
-
-        api_throttler = self.api_throttler
-
-        return
-
-    def test_run(self):
-        self.api_throttler.start()
-
-        time.sleep(2)
-
-        ac = APIConsumer()
-
-        begin = datetime.now().strftime('%Y/%m/%d %H:%M:%S.%f')
-        print('Start requesting @ %s' % (begin))
-        for i in range(2):
-            self.assertTrue(ac.request_api())
-        end = datetime.now().strftime('%Y/%m/%d %H:%M:%S.%f')
-        print('Stop requesting @ %s' % (end))
-
-        return
-
-    def runTest(self):
-        self.test_run()
-        return
-
-    def tearDown(self):
-        self.api_throttler.stop()
-        del self.api_throttler
-        return
-
-class APIConsumer(object):
-    def __init__(self):
-        global api_token_bucket
-        global api_throttler
-        self.logger = logging.getLogger('%s.%s' % (self.__module__,
-                                        self.__class__.__name__))
-        self.logger.setLevel(logging.NOTSET)
-
-        super(APIConsumer, self).__init__()
-
-        self.api_token_bucket = api_throttler
-        return
-
-    def request_api(self):
-        try:
-            api_token = self.api_token_bucket.request_token()
-            if 'API Token' in api_token:
-                self.logger.debug(api_token)
-                return True
-        except Exception as e:
-            return False
-
-        return False
-
-class WeiboMiner(APIConsumer):
-    def __init__(self):
-        super(WeiboMiner, self).__init__()
+        #super(object, self).__init__()
 
         self.logger = logging.getLogger('%s.%s' % (self.__module__,
                                         self.__class__.__name__))
         self.logger.setLevel(logging.NOTSET)
 
-        self.key = ''
-        self.secret = ''
-        self.code = ''
-        self.access_token = ''
-        self.expires_in = 0
-
-        #self.load_access_token()
-
-        #if not self.authorize():
-        #    if not self.request_access_token():
-        #        self.logger.error('0x{_id:X}: Failed to get authorization'.format(
-        #                          _id=id(self), data=data))
-        #        return
-
+        self.api_client = weibo_api_client
         return
 
-    def request_access_token(self):
-        '''Request access token from Weibo API interface
-        '''
-        auth_url = self.api_client.get_authorize_url()
-
-        resp = urllib2.urlopen(auth_url)
-        print(resp.__class__.__name__)
-        print(dir(resp))
-        print(resp.url)
-        print(resp.msg)
-        print(resp.headers)
-        print(resp.info)
-        if isinstance(resp, urllib2.Request):
-            print(resp)
-            pass
-        else:
-            pass
-
-        print('Open this URL in web browser:\n%s' % auth_url)
-
-        self.code = raw_input('Paste access_token here:>')
-
-        r = self.api_client.request_access_token(self.code)
-        self.logger.debug(r)
-        access_token, expire_in = r.access_token, r.expires_in
-        self.api_client.set_access_token(access_token, expire_in)
-
-        self.update_access_token(self.access_token)
-
-        return True
-
-    def update_access_token(self, access_token, expires_in=None):
-        '''Update access token and save it into access_token file
-        '''
-        self.access_token = access_token
-        self.expires_in = expires_in
-
-        if not access_token:
-            self.logger.error('0x{_id:X}: No access token was granted'.format(
-                              _id=id(self)))
-            return False
-
-        with open('access_token.json', 'rw+') as token_file:
-            data = json.load(token_file)
-            data['access_token'] = access_token
-            token_file.seek(0)
-            token_file.truncate()
-            json.dump(data, token_file, indent=4)
-
-        return
-
-    def load_access_token(self):
-        with open('access_token.json', 'r') as token_file:
-            data = json.load(token_file)
-            self.logger.debug('0x{_id:X}: {data}'.format(_id=id(self),
-                              data=data))
-
-            try:
-                self.key = data['key']
-                self.secret = data['secret']
-                self.code = data['code']
-                self.access_token = data['access_token']
-                self.expire_in = data['expire_in']
-            except KeyError as e:
-                self.logger.error('0x{_id:X}: {e}'.format(_id=id(self), e=e))
-                return
-
-        return self.access_token
-
-    def authorize(self):
-        '''Get authorization from Weibo using OAuth2
-        '''
-
-        redirect_uri = 'https://api.weibo.com/oauth2/default.html'
-        self.api_client = WeiboAPIClient(app_key=self.key,
-                                              app_secret=self.secret,
-                                              redirect_uri=redirect_uri)
-        print(self.access_token, self.expires_in)
-        self.api_client.set_access_token(self.access_token,
-                                              self.expires_in)
-
-        #return True
-        return False
-
-    def dig(self):
+    def fetch_followers(self):
         params = {'uid' : 1073610035, 'count' : 1000}
 
         try:
@@ -322,9 +90,8 @@ class WeiboMiner(APIConsumer):
                     self.logger.error('Failed to get api token')
                     break
                 user_info = self.api_client.users.show.get(**params)
-                self.logger.debug('0x{0:X} {1} {2}' % (id(self),
-                                  user_info['id'],
-                                  user_info['screen_name']))
+                self.logger.debug('0x{0:X} {1} {2}'.format(id(self),
+                                  user_info['id'], user_info['screen_name']))
             except UnicodeError as e:
                 print(user_info)
                 pass
@@ -334,90 +101,37 @@ class WeiboMiner(APIConsumer):
 
         return
 
-    def login(self):
-        self.br = mechanize.Browser()
-        self.br.set_handle_robots(False)
-        #self.br.set_handle_refresh(False)
-        self.br.addheaders = [('User-Agent', 'Mozilla/5.0 Chrome/26.0.1410.64 Safari/537.31')]
-        url_login = 'http://login.sina.com.cn'
 
-        resp = self.br.open(url_login)
-        print(resp.read())
+    def find_closest_friends(self, uid=None):
+        '''Find the closes friends of an user
+        '''
+        params = {'uid' : 1073610035, 'count' : 10}
 
-        for form in self.br.forms():
-            print('Form name: %s' % form.name)
-            print(form)
-
-        self.br.form = list(self.br.forms())[0]
-
-        for control in self.br.form.controls:
-            print(control)
-            try:
-                value = self.br[control.name]
-                print('type:%s, name:%s, value:%s' % (control.type,
-                      control.name, value))
-            except ValueError as e:
-                pass
-
-        control_username = self.br.form.find_control('username')
-        control_username.value = 'kevin.misc.10@gmail.com'
-        control_password = self.br.form.find_control('password')
-        control_password.value = '951753'
-
-        resp = self.br.submit()
-        html = resp.read()
-        print(html)
+        # 1. fetch 30 post
+        statuses = self.api_client.get.statuses__bilateral_timeline(**params)
+        for s in statuses['statuses']:
+            print(s['id'])
+            print(s['text'].encode('utf-8'))
+            print(s['user']['id'])
+            print(s['user']['screen_name'].encode('utf-8'))
+            print('---------------------------')
+            #json.dumps(s)
+        # 2. fetch all comments of these post
+        # 3. fetch user id of these comments
 
         return
 
 
-class WeiboMinerTest(TestCase):
+class WeiboMinerTest(unittest.TestCase):
     def setUp(self):
         self.miner = WeiboMiner()
 
         return
 
-    def test_update_access_token(self):
-        access_token = '1234567890'
-        self.miner.update_access_token(access_token)
-
-        self.assertEqual(access_token, self.miner.load_access_token())
-
-        return
-
-
-    def test_load_access_token(self):
-        access_token = self.miner.load_access_token()
-        print(access_token)
-        #self.assertIsNone(self.miner.load_access_token())
-        return
-
-    def test_login(self):
-        self.miner.login()
-        return
-
-    def runTest(self, output=None):
-        #self.test_load_access_token()
-        #self.test_update_access_token()
-        self.test_login()
-        return
-
-    def tearDown(self):
-        del self.miner
-        return
-
-
-api_throttler = APIThrottler()
-
 
 def main():
-    global api_throttler
-
-    api_throttler.start()
-
     weibo_miner = WeiboMiner()
-    weibo_miner.dig()
-    api_throttler.stop()
+    weibo_miner.find_closest_friends()
 
     return
 
@@ -487,6 +201,7 @@ def test():
         else:
             print(k, v)
     return
+
 
 if __name__ == '__main__':
     main()

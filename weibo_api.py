@@ -140,22 +140,22 @@ _HTTP_POST = 1
 _HTTP_UPLOAD = 2
 
 def _http_get(url, authorization=None, **kw):
-    logging.info('GET %s' % url)
+    #logging.info('GET %s' % url)
     return _http_call(url, _HTTP_GET, authorization, **kw)
 
 def _http_post(url, authorization=None, **kw):
-    logging.info('POST %s' % url)
+    #logging.info('POST %s' % url)
     return _http_call(url, _HTTP_POST, authorization, **kw)
 
 def _http_upload(url, authorization=None, **kw):
-    logging.info('MULTIPART POST %s' % url)
+    #logging.info('MULTIPART POST %s' % url)
     return _http_call(url, _HTTP_UPLOAD, authorization, **kw)
 
 def _read_body(obj):
     using_gzip = obj.headers.get('Content-Encoding', '')=='gzip'
     body = obj.read()
     if using_gzip:
-        logging.info('gzip content received.')
+        #logging.info('gzip content received.')
         gzipper = gzip.GzipFile(fileobj=StringIO(body))
         fcontent = gzipper.read()
         gzipper.close()
@@ -245,7 +245,7 @@ class APIClient(object):
             return s.replace('-', '+').replace('_', '/') + appendix
 
         sr = str(signed_request)
-        logging.info('parse signed request: %s' % sr)
+        #logging.info('parse signed request: %s' % sr)
         enc_sig, enc_payload = sr.split('.', 1)
         sig = base64.b64decode(_b64_normalize(enc_sig))
         data = _parse_json(base64.b64decode(_b64_normalize(enc_payload)))
